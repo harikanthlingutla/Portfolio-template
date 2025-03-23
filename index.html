@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Portfolio</title>
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --text-dark: #e0e0e0;
+            --accent-dark: #00b0ff;
+            --secondary-dark: #333333;
+            --terminal-bg-dark: rgba(0, 0, 0, 0.8);
+            
+            --bg-light: #f5f5f5;
+            --text-light: #121212;
+            --accent-light: #0066cc;
+            --secondary-light: #e0e0e0;
+            --terminal-bg-light: rgba(240, 240, 240, 0.9);
+            
+            --bg: var(--bg-dark);
+            --text: var(--text-dark);
+            --accent: var(--accent-dark);
+            --secondary: var(--secondary-dark);
+            --terminal-bg: var(--terminal-bg-dark);
+            
+            --navbar-width: 60px;
+            --terminal-height: 300px;
+            --terminal-width: 600px;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+        
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--navbar-width);
+            height: 100vh;
+            background-color: var(--secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            z-index: 100;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-icon {
+            width: 30px;
+            height: 30px;
+            margin: 15px 0;
+            cursor: pointer;
+            color: var(--text);
+            transition: color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nav-icon:hover {
+            color: var(--accent);
+            transform: scale(1.1);
+        }
+        
+        .theme-toggle {
+            margin-top: auto;
+            margin-bottom: 20px;
+        }
+        
+        /* Main content */
+        .main-content {
+            margin-left: var(--navbar-width);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Terminal */
+        .terminal-container {
+            width: var(--terminal-width);
+            height: var(--terminal-height);
+            background-color: var(--terminal-bg);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .terminal-header {
+            height: 30px;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+        
+        .terminal-buttons {
+            display: flex;
+        }
+        
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .terminal-button.red { background-color: #ff5f56; }
+        .terminal-button.yellow { background-color: #ffbd2e; }
+        .terminal-button.green { background-color: #27c93f; }
+        
+        .terminal-title {
+            margin-left: 10px;
+            font-size: 12px;
+            color: var(--text);
+            opacity: 0.7;
+        }
+        
+        .terminal-body {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+        
+        .terminal-input-line {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        
+        .terminal-prompt {
+            color: var(--accent);
+            margin-right: 10px;
+        }
+        
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            flex: 1;
+            outline: none;
+        }
+        
+        .terminal-output {
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+        }
+        
+        /* Content sections */
+        .content-section {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        /* Blog post */
+        .blog-post {
+            background-color: var(--secondary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .blog-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .blog-date {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+        
+        .blog-content {
+            line-height: 1.6;
+        }
+        
+        /* Code block */
+        .code-block {
+            background-color: var(--bg);
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        /* Project card */
+        .project-card {
+            background-color: var(--secondary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .project-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .project-description {
+            margin-bottom: 15px;
+        }
+        
+        .project-links {
+            display: flex;
+        }
+        
+        .project-link {
+            margin-right: 15px;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .project-link svg {
+            margin-right: 5px;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            :root {
+                --navbar-width: 50px;
+                --terminal-width: 90vw;
+                --terminal-height: 250px;
+            }
+            
+            .terminal-title {
+                display: none;
+            }
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jetbrains-mono/1.0.6/web/JetBrainsMono.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-icon" id="home-icon" onclick="setActiveSection('home')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        </div>
+        <div class="nav-icon" id="blog-icon" onclick="setActiveSection('blog')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+        </div>
+        <div class="nav-icon" id="projects-icon" onclick="setActiveSection('projects')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"></path><path d="M17.64 15 22 10.64"></path><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H9l.92.82A6.18 6.18 0 0 1 12 8.4v1.56l2 2h2.47l2.26 1.91"></path></svg>
+        </div>
+        <div class="nav-icon" id="about-icon" onclick="setActiveSection('about')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="10" r="3"></circle><path d="M7 20.662V19c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2v1.662"></path></svg>
+        </div>
+        <div class="nav-icon" id="contact-icon" onclick="setActiveSection('contact')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        </div>
+        <div class="nav-icon theme-toggle" id="theme-toggle">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sun-icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="moon-icon" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="main-content">
+        <div class="terminal-container">
+            <div class="terminal-header">
+                <div class="terminal-buttons">
+                    <div class="terminal-button red"></div>
+                    <div class="terminal-button yellow"></div>
+                    <div class="terminal-button green"></div>
+                </div>
+                <div class="terminal-title">user@portfolio:~</div>
+            </div>
+            <div class="terminal-body" id="terminal-body">
+                <div class="terminal-output">Welcome to my portfolio! Type 'help' to see available commands.</div>
+                <div class="terminal-input-line">
+                    <span class="terminal-prompt">$</span>
+                    <input type="text" class="terminal-input" id="terminal-input" autofocus>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Content sections -->
+        <section id="home" class="content-section active">
+            <!-- Home content will be inserted dynamically -->
+        </section>
+        
+        <section id="blog" class="content-section">
+            <div class="blog-post">
+                <h2 class="blog-title">Building a Real-time Data Visualization Dashboard</h2>
+                <div class="blog-date">March 15, 2025</div>
+                <div class="blog-content">
+                    <p>In this tutorial, I'll walk you through creating a real-time data visualization dashboard using React and D3.js.</p>
+                    <div class="code-block">
+                        <pre><code>// Sample React component with D3.js integration
+import React, { useEffect, useRef } from 'react';
+import * as d3 from 'd3';
+
+const RealTimeChart = ({ data }) => {
+  const svgRef = useRef();
+  
+  useEffect(() => {
+    if (!data) return;
+    
+    const svg = d3.select(svgRef.current);
+    
+    // D3.js visualization code here
+    // ...
+    
+  }, [data]);
+  
+  return <svg ref={svgRef} width="100%" height="400" />;
+};</code></pre>
+                    </div>
+                    <p>The dashboard updates automatically as new data comes in, providing valuable insights in real-time.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="projects" class="content-section">
+            <div class="project-card">
+                <h3 class="project-title">Neural Network Visualization</h3>
+                <div class="project-description">
+                    An interactive tool for visualizing neural networks and their training process in real-time.
+                </div>
+                <div class="project-links">
+                    <a href="#" class="project-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                        GitHub
+                    </a>
+                    <a href="#" class="project-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        Demo
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <section id="about" class="content-section">
+            <!-- About content will be inserted dynamically -->
+        </section>
+        
+        <section id="contact" class="content-section">
+            <!-- Contact content will be inserted dynamically -->
+        </section>
+    </main>
+
+    <script>
+        // Terminal functionality
+        const terminal = {
+            input: document.getElementById('terminal-input'),
+            output: document.getElementById('terminal-body'),
+            history: [],
+            historyIndex: -1,
+            
+            // Initialize terminal
+            init: function() {
+                this.input.addEventListener('keydown', this.handleKeyPress.bind(this));
+                this.input.focus();
+                
+                // When clicking anywhere on terminal body, focus the input
+                this.output.addEventListener('click', () => {
+                    this.input.focus();
+                });
+            },
+            
+            // Handle key presses
+            handleKeyPress: function(e) {
+                if (e.key === 'Enter') {
+                    const command = this.input.value.trim();
+                    if (command) {
+                        this.executeCommand(command);
+                        this.history.push(command);
+                        this.historyIndex = this.history.length;
+                    }
+                    this.input.value = '';
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    this.navigateHistory(-1);
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    this.navigateHistory(1);
+                }
+            },
+            
+            // Navigate command history
+            navigateHistory: function(direction) {
+                this.historyIndex += direction;
+                
+                if (this.historyIndex < 0) {
+                    this.historyIndex = 0;
+                } else if (this.historyIndex > this.history.length) {
+                    this.historyIndex = this.history.length;
+                    this.input.value = '';
+                    return;
+                }
+                
+                if (this.historyIndex === this.history.length) {
+                    this.input.value = '';
+                } else {
+                    this.input.value = this.history[this.historyIndex];
+                }
+            },
+            
+            // Execute command
+            executeCommand: function(command) {
+                // Add command to output
+                const commandLine = document.createElement('div');
+                commandLine.className = 'terminal-input-line';
+                commandLine.innerHTML = `<span class="terminal-prompt">$</span> ${command}`;
+                
+                // Insert before the current input line
+                this.output.insertBefore(commandLine, this.output.lastChild);
+                
+                // Process command and get output
+                const output = this.processCommand(command);
+                
+                // Add output to terminal
+                if (output) {
+                    const outputElement = document.createElement('div');
+                    outputElement.className = 'terminal-output';
+                    outputElement.innerHTML = output;
+                    this.output.insertBefore(outputElement, this.output.lastChild);
+                }
+                
+                // Scroll to bottom
+                this.output.scrollTop = this.output.scrollHeight;
+            },
+            
+            // Process commands
+            processCommand: function(command) {
+                const parts = command.split(' ');
+                const cmd = parts[0].toLowerCase();
+                const args = parts.slice(1);
+                
+                switch (cmd) {
+                    case 'help':
+                        return `Available commands:
+- help: Display this help message
+- ls: List available sections
+- cd [section]: Navigate to a section (blog, projects, about, contact)
+- clear: Clear the terminal
+- view [section]: View content of a section
+- theme: Toggle between light and dark theme`;
+                    
+                    case 'ls':
+                        return 'home\nblog\nprojects\nabout\ncontact';
+                    
+                    case 'cd':
+                        if (args.length === 0) {
+                            return 'Usage: cd [section]';
+                        }
+                        const section = args[0].toLowerCase();
+                        if (['home', 'blog', 'projects', 'about', 'contact'].includes(section)) {
+                            setActiveSection(section);
+                            return `Navigated to ${section}`;
+                        } else {
+                            return `Section '${section}' not found`;
+                        }
+                    
+                    case 'clear':
+                        // Clear all output except the current input line
+                        const inputLine = this.output.lastChild;
+                        this.output.innerHTML = '';
+                        this.output.appendChild(inputLine);
+                        return null;
+                    
+                    case 'view':
+                        if (args.length === 0) {
+                            return 'Usage: view [section]';
+                        }
+                        const viewSection = args[0].toLowerCase();
+                        if (['home', 'blog', 'projects', 'about', 'contact'].includes(viewSection)) {
+                            setActiveSection(viewSection);
+                            return `Viewing ${viewSection}`;
+                        } else {
+                            return `Section '${viewSection}' not found`;
+                        }
+                    
+                    case 'theme':
+                        toggleTheme();
+                        return `Switched to ${document.body.classList.contains('light-theme') ? 'light' : 'dark'} theme`;
+                    
+                    default:
+                        return `Command not found: ${cmd}. Type 'help' for available commands.`;
+                }
+            }
+        };
+        
+        // Initialize terminal
+        terminal.init();
+        
+        // Set active section
+        function setActiveSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(section).classList.add('active');
+            
+            // Update nav icons
+            document.querySelectorAll('.nav-icon').forEach(el => {
+                el.style.color = '';
+            });
+            document.getElementById(`${section}-icon`).style.color = 'var(--accent)';
+            
+            // Load content dynamically if needed
+            loadSectionContent(section);
+        }
+        
+        // Load section content
+        function loadSectionContent(section) {
+            const contentElement = document.getElementById(section);
+            
+            // Only load content if it's empty
+            if (contentElement.children.length === 0) {
+                switch (section) {
+                    case 'home':
+                        contentElement.innerHTML = `
+                            <div style="text-align: center; margin-top: 30px;">
+                                <h1 style="font-size: 42px; margin-bottom: 10px;">John Doe</h1>
+                                <h2 style="font-size: 24px; font-weight: normal; margin-bottom: 30px; color: var(--accent);">Full-Stack Developer</h2>
+                                <p style="max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                                    I build high-performance web applications with modern technologies.
+                                    Explore my projects and blog posts using the terminal or navigation sidebar.
+                                </p>
+                                <div style="margin-top: 30px;">
+                                    <span style="background-color: var(--secondary); padding: 8px 12px; border-radius: 4px; margin: 5px; display: inline-block;">JavaScript</span>
+                                    <span style="background-color: var(--secondary); padding: 8px 12px; border-radius: 4px; margin: 5px; display: inline-block;">React</span>
+                                    <span style="background-color: var(--secondary); padding: 8px 12px; border-radius: 4px; margin: 5px; display: inline-block;">Node.js</span>
+                                    <span style="background-color: var(--secondary); padding: 8px 12px; border-radius: 4px; margin: 5px; display: inline-block;">Python</span>
+                                    <span style="background-color: var(--secondary); padding: 8px 12px; border-radius: 4px; margin: 5px; display: inline-block;">Data Visualization</span>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    
+                    case 'about':
+                        contentElement.innerHTML = `
+                            <h2 style="color: var(--accent); margin-bottom: 20px;">About Me</h2>
+                            <p style="line-height: 1.6; margin-bottom: 20px;">
+                                I'm a passionate developer with over 5 years of experience building web applications
+                                and data visualization tools. My background in computer science and data analytics
+                                allows me to create efficient, scalable solutions for complex problems.
+                            </p>
+                            <h3 style="color: var(--accent); margin-bottom: 15px;">Skills</h3>
+                            <ul style="line-height: 1.6; margin-bottom: 20px;">
+                                <li>Front-end: React, Vue.js, D3.js, Three.js</li>
+                                <li>Back-end: Node.js, Express, Django, Flask</li>
+                                <li>Data: Python, NumPy, Pandas, Jupyter, TensorFlow</li>
+                                <li>DevOps: Docker, CI/CD, AWS, Netlify</li>
+                            </ul>
+                            <h3 style="color: var(--accent); margin-bottom: 15px;">Experience</h3>
+                            <div style="margin-bottom: 15px;">
+                                <h4 style="margin-bottom: 5px;">Senior Developer – Tech Innovations Inc.</h4>
+                                <p style="opacity: 0.7; margin-bottom: 10px;">2022 – Present</p>
+                                <p>Leading development for data visualization products and interactive web applications.</p>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <h4 style="margin-bottom: 5px;">Full-Stack Developer – Web Solutions Group</h4>
+                                <p style="opacity: 0.7; margin-bottom: 10px;">2020 – 2022</p>
+                                <p>Built and maintained client websites and web applications using modern frameworks.</p>
+                            </div>
+                        `;
+                        break;
+                    
+                    case 'contact':
+                        contentElement.innerHTML = `
+                            <h2 style="color: var(--accent); margin-bottom: 20px;">Contact Me</h2>
+                            <p style="line-height: 1.6; margin-bottom: 30px;">
+                                Feel free to reach out if you're interested in collaborating on a project
+                                or if you have any questions about my work.
+                            </p>
+                            <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 30px;">
+                                <a href="mailto:hello@example.com" style="display: flex; align-items: center; color: var(--text); text-decoration: none; background-color: var(--secondary); padding: 12px 20px; border-radius: 8px; transition: transform 0.2s, background-color 0.2s;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                    hello@example.com
+                                </a>
+                                <a href="https://github.com/" target="_blank" style="display: flex; align-items: center; color: var(--text); text-decoration: none; background-color: var(--secondary); padding: 12px 20px; border-radius: 8px; transition: transform 0.2s, background-color 0.2s;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px;"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                                    GitHub
+                                </a>
+                                <a href="https://linkedin.com/" target="_blank" style="display: flex; align-items: center; color: var(--text); text-decoration: none; background-color: var(--secondary); padding: 12px 20px; border-radius: 8px; transition: transform 0.2s, background-color 0.2s;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px;"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                                    LinkedIn
+                                </a>
+                                <a href="https://twitter.com/" target="_blank" style="display: flex; align-items: center; color: var(--text); text-decoration: none; background-color: var(--secondary); padding: 12px 20px; border-radius: 8px; transition: transform 0.2s, background-color 0.2s;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px;"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+                                    Twitter
+                                </a>
+                            </div>
+                            <div style="background-color: var(--secondary); border-radius: 8px; padding: 30px; max-width: 500px;">
+                                <h3 style="margin-bottom: 20px; color: var(--accent);">Send a Message</h3>
+                                <form>
+                                    <div style="margin-bottom: 15px;">
+                                        <label for="name" style="display: block; margin-bottom: 5px;">Name</label>
+                                        <input type="text" id="name" name="name" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--accent); background-color: var(--bg); color: var(--text);">
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <label for="email" style="display: block; margin-bottom: 5px;">Email</label>
+                                        <input type="email" id="email" name="email" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--accent); background-color: var(--bg); color: var(--text);">
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <label for="message" style="display: block; margin-bottom: 5px;">Message</label>
+                                        <textarea id="message" name="message" rows="4" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--accent); background-color: var(--bg); color: var(--text);"></textarea>
+                                    </div>
+                                    <button type="submit" style="background-color: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Send Message</button>
+                                </form>
+                            </div>
+                        `;
+                        break;
+                }
+            }
+        }
+        
+        // Toggle theme
+        function toggleTheme() {
+            const body = document.body;
+            const sunIcon = document.querySelector('.sun-icon');
+            const moonIcon = document.querySelector('.moon-icon');
+            
+            body.classList.toggle('light-theme');
+            
+            if (body.classList.contains('light-theme')) {
+                document.documentElement.style.setProperty('--bg', 'var(--bg-light)');
+                document.documentElement.style.setProperty('--text', 'var(--text-light)');
+                document.documentElement.style.setProperty('--accent', 'var(--accent-light)');
+                document.documentElement.style.setProperty('--secondary', 'var(--secondary-light)');
+                document.documentElement.style.setProperty('--terminal-bg', 'var(--terminal-bg-light)');
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            } else {
+                document.documentElement.style.setProperty('--bg', 'var(--bg-dark)');
+                document.documentElement.style.setProperty('--text', 'var(--text-dark)');
+                document.documentElement.style.setProperty('--accent', 'var(--accent-dark)');
+                document.documentElement.style.setProperty('--secondary', 'var(--secondary-dark)');
+                document.documentElement.style.setProperty('--terminal-bg', 'var(--terminal-bg-dark)');
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            }
+        }
+        
+        // Function to add more projects
+        function addProject(title, description, githubUrl, demoUrl) {
+            const projectsSection = document.getElementById('projects');
+            const projectCard = document.createElement('div');
+            projectCard.className = 'project-card';
+            
+            projectCard.innerHTML = `
+                <h3 class="project-title">${title}</h3>
+                <div class="project-description">${description}</div>
+                <div class="project-links">
+                    <a href="${githubUrl}" class="project-link" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                        GitHub
+                    </a>
+                    <a href="${demoUrl}" class="project-link" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        Demo
+                    </a>
+                </div>
+            `;
+            
+            projectsSection.appendChild(projectCard);
+        }
+        
+        // Add additional projects
+        addProject(
+            "AI-Powered Content Generator",
+            "A web application that leverages machine learning to generate various types of content including blog posts, product descriptions, and social media updates.",
+            "#",
+            "#"
+        );
+        
+        addProject(
+            "Interactive Data Explorer",
+            "A tool for non-technical users to upload, explore, and visualize their data through an intuitive drag-and-drop interface.",
+            "#",
+            "#"
+        );
+        
+        // Function to add more blog posts
+        function addBlogPost(title, date, content, code) {
+            const blogSection = document.getElementById('blog');
+            const blogPost = document.createElement('div');
+            blogPost.className = 'blog-post';
+            
+            blogPost.innerHTML = `
+                <h2 class="blog-title">${title}</h2>
+                <div class="blog-date">${date}</div>
+                <div class="blog-content">
+                    <p>${content}</p>
+                    ${code ? `<div class="code-block"><pre><code>${code}</code></pre></div>` : ''}
+                </div>
+            `;
+            
+            blogSection.appendChild(blogPost);
+        }
+        
+        // Add additional blog posts
+        addBlogPost(
+            "Creating Interactive Jupyter Notebooks for Data Science",
+            "February 20, 2025",
+            "Jupyter notebooks are a powerful tool for data scientists and analysts. In this post, I'll share techniques for making your notebooks more interactive and engaging.",
+            `# Import libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from ipywidgets import interact, interactive, fixed, interact_manual
+import ipywidgets as widgets
+
+# Create an interactive function
+def plot_distribution(column, bins=30):
+    plt.figure(figsize=(10, 6))
+    plt.hist(df[column], bins=bins)
+    plt.title(f'Distribution of {column}')
+    plt.xlabel(column)
+    plt.ylabel('Frequency')
+    plt.show()
+
+# Use interact to create the widget
+interact(plot_distribution, 
+         column=['age', 'income', 'education'], 
+         bins=widgets.IntSlider(min=5, max=100, step=5, value=30))`
+        );
+        
+        addBlogPost(
+            "Optimizing React Applications for Performance",
+            "January 10, 2025",
+            "Performance optimization is crucial for providing a smooth user experience. This post explores several techniques to optimize React applications.",
+            `// 1. Use React.memo for component memoization
+const ProductCard = React.memo(({ product }) => {
+  // Component implementation
+});
+
+// 2. Optimize useEffect dependencies
+useEffect(() => {
+  // Only runs when productId changes
+  fetchProductDetails(productId);
+}, [productId]);
+
+// 3. Use lazy loading for components
+const LazyComponent = React.lazy(() => import('./LazyComponent'));
+
+function MyComponent() {
+  return (
+    <React.Suspense fallback={<div>Loading...</div>}>
+      <LazyComponent />
+    </React.Suspense>
+  );
+}`
+        );
+    </script>
+</body>
+</html>
